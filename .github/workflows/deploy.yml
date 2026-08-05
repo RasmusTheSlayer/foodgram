@@ -49,7 +49,6 @@ jobs:
             sudo docker compose -f docker-compose.yml pull
             sudo docker compose -f docker-compose.yml up -d
             sudo docker compose -f docker-compose.yml exec backend python manage.py migrate --noinput
-            sudo docker compose -f docker-compose.yml exec backend python manage.py load_ingredients
             sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic --noinput --clear
 
             mkdir -p frontend/build
