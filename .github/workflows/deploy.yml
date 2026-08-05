@@ -2,7 +2,7 @@ name: Foodgram CI/CD
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build_and_push:
