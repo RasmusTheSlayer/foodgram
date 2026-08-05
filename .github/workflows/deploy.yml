@@ -49,6 +49,7 @@ jobs:
             sudo docker compose -f docker-compose.yml up -d --no-deps backend frontend
             sudo docker compose -f docker-compose.yml exec backend python manage.py migrate --noinput
             sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic --noinput --clear
+
             mkdir -p frontend/build
             sudo docker run --rm -v $(pwd)/frontend/build:/mnt ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest sh -c "cp -r /app/build/. /mnt/"
             sudo docker compose -f docker-compose.yml restart nginx
