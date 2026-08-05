@@ -45,9 +45,10 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             cd foodgram/infra/
-            sudo docker compose -f docker-compose.yml pull backend frontend
-            sudo docker compose -f docker-compose.yml up -d --no-deps backend frontend
+            sudo docker compose -f docker-compose.yml pull
+            sudo docker compose -f docker-compose.yml up -d
             sudo docker compose -f docker-compose.yml exec backend python manage.py migrate --noinput
+            sudo docker compose -f docker-compose.yml exec backend python manage.py load_ingredients --no-input
             sudo docker compose -f docker-compose.yml exec backend python manage.py collectstatic --noinput --clear
 
             mkdir -p frontend/build

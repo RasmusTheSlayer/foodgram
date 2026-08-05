@@ -26,7 +26,8 @@ services:
       - ../frontend/:/app/result_build/build/
 
   nginx:
-    image: nginx:1.21.3-alpine
+    build: ./nginx/
+    image: rasmustheslayer/kittygram_gateway
     ports:
       - "80:80"
     volumes:
