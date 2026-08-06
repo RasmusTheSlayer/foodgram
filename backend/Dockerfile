@@ -10,4 +10,4 @@ COPY . .
 
 COPY data/ingredients.json /app/data/ingredients.json
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "kittygram_backend.wsgi"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "foodgram_backend.wsgi"]
