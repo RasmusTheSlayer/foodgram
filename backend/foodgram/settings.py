@@ -8,7 +8,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key-for-dev')
 if not SECRET_KEY:
     SECRET_KEY = get_random_secret_key()
 
-DEBUG = True
+DEBUG = os.getenv('DEBUG')
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
