@@ -1,13 +1,12 @@
 FROM python:3.12-slim
 WORKDIR /app
 
-RUN pip install gunicorn==25.3.0
-
 COPY backend/requirements.txt .
-RUN pip install -r requirements.txt --no-cache-dir
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
-
+COPY backend/ .
 COPY data/ingredients.json /app/data/ingredients.json
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "foodgram_backend.wsgi"]
+CMD ["sh", "-c", "python manage.py migrate --noinput && \
+                  python manage.py collectstatic --noinput --clear && \
+                  gunicorn foodgram.wsgi:application --bind 0.0.0.0:8000"]
