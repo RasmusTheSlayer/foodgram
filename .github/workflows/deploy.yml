@@ -28,7 +28,7 @@ jobs:
       - name: Build and push frontend image
         uses: docker/build-push-action@v4
         with:
-          context: ./frontend/Dockerfile
+          context: ./frontend
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
 
