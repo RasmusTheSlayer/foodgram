@@ -1,0 +1,5 @@
+repo_owner: RasmusTheSlayer
+repo_name: foodgram
+deploy_ip: 158.160.225.95
+deploy_user: ubuntu
+foodgram_domain: foodgramproject.ru, www.foodgramproject.ru
