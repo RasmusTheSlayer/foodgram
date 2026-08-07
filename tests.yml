@@ -5,3 +5,4 @@ deploy_user: ubuntu
 foodgram_domain: foodgramproject.ru, www.foodgramproject.ru
 login: admin
 password: 019283
+vm_name: r-backend-vm-1020537076
