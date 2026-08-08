@@ -147,9 +147,12 @@ class UserViewSet(DjoserUserViewSet):
     serializer_class = UserSerializer
     pagination_class = CustomPagination
 
+    @action(
+        detail=False,
+        methods=['get', 'put', 'patch', 'delete'],
+        permission_classes=[permissions.IsAuthenticated],
+    )
     def me(self, request, *args, **kwargs):
-        if request.method not in ('GET', 'PUT', 'PATCH'):
-            return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return super().me(request, *args, **kwargs)
 
     @action(
