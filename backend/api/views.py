@@ -52,8 +52,10 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,
-                          IsAuthorOrReadOnly)
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthorOrReadOnly,
+    )
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -63,13 +65,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeWriteSerializer
 
-    @action(detail=True, methods=['post'],
-            permission_classes=[permissions.IsAuthenticated])
+    def perform_create(self, serializer):
+        # Автор передаётся в сериализаторе, метод оставлен для совместимости
+        pass
+
+    @action(
+        detail=True,
+        methods=['post'],
+        permission_classes=[permissions.IsAuthenticated],
+    )
     def favorite(self, request, pk=None):
         recipe = self.get_object()
         serializer = FavoriteSerializer(
             data={'user': request.user.id, 'recipe': recipe.id},
-            context={'request': request}
+            context={'request': request},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -84,17 +93,20 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if not deleted:
             return Response(
                 {'detail': 'Рецепта нет в избранном.'},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=['post'],
-            permission_classes=[permissions.IsAuthenticated])
+    @action(
+        detail=True,
+        methods=['post'],
+        permission_classes=[permissions.IsAuthenticated],
+    )
     def shopping_cart(self, request, pk=None):
         recipe = self.get_object()
         serializer = ShoppingCartSerializer(
             data={'user': request.user.id, 'recipe': recipe.id},
-            context={'request': request}
+            context={'request': request},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -109,18 +121,24 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if not deleted:
             return Response(
                 {'detail': 'Рецепта нет в корзине.'},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=['get'],
-            permission_classes=[permissions.IsAuthenticated])
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[permissions.IsAuthenticated],
+    )
     def download_shopping_cart(self, request):
-        ingredients = RecipeIngredient.objects.filter(
-            recipe__in_shopping_cart__user=request.user
-        ).values(
-            'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(total_amount=Sum('amount')).order_by('ingredient__name')
+        ingredients = (
+            RecipeIngredient.objects.filter(
+                recipe__in_shopping_cart__user=request.user
+            )
+            .values('ingredient__name', 'ingredient__measurement_unit')
+            .annotate(total_amount=Sum('amount'))
+            .order_by('ingredient__name')
+        )
 
         lines = ['Список покупок:\n']
         for item in ingredients:
@@ -159,7 +177,7 @@ class UserViewSet(DjoserUserViewSet):
         detail=False,
         methods=['put'],
         url_path='me/avatar',
-        permission_classes=[permissions.IsAuthenticated]
+        permission_classes=[permissions.IsAuthenticated],
     )
     def avatar_upload(self, request):
         serializer = AvatarSerializer(data=request.data)
@@ -168,7 +186,7 @@ class UserViewSet(DjoserUserViewSet):
         request.user.save()
         return Response(
             {'avatar': request.user.avatar.url},
-            status=status.HTTP_200_OK
+            status=status.HTTP_200_OK,
         )
 
     @avatar_upload.mapping.delete
@@ -176,13 +194,16 @@ class UserViewSet(DjoserUserViewSet):
         request.user.avatar.delete(save=True)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=['post'],
-            permission_classes=[permissions.IsAuthenticated])
+    @action(
+        detail=True,
+        methods=['post'],
+        permission_classes=[permissions.IsAuthenticated],
+    )
     def subscribe(self, request, id=None):
         author = get_object_or_404(User, id=id)
         serializer = SubscriptionSerializer(
             data={'user': request.user.id, 'author': author.id},
-            context={'request': request}
+            context={'request': request},
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -197,11 +218,14 @@ class UserViewSet(DjoserUserViewSet):
         if not deleted:
             return Response(
                 {'detail': 'Вы не были подписаны.'},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, permission_classes=[permissions.IsAuthenticated])
+    @action(
+        detail=False,
+        permission_classes=[permissions.IsAuthenticated],
+    )
     def subscriptions(self, request):
         subs = Subscription.objects.filter(user=request.user).order_by('id')
         page = self.paginate_queryset(subs)
