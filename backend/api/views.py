@@ -65,10 +65,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             return RecipeReadSerializer
         return RecipeWriteSerializer
 
-    def perform_create(self, serializer):
-        # Автор передаётся в сериализаторе, метод оставлен для совместимости
-        pass
-
     @action(
         detail=True,
         methods=['post'],
@@ -143,9 +139,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         lines = ['Список покупок:\n']
         for item in ingredients:
             lines.append(
-                f'{item['ingredient__name']} '
-                f'({item['ingredient__measurement_unit']}) — '
-                f'{item['total_amount']}\n'
+                f"{item['ingredient__name']} "
+                f"({item['ingredient__measurement_unit']}) — "
+                f"{item['total_amount']}\n"
             )
         response = HttpResponse(''.join(lines), content_type='text/plain')
         response['Content-Disposition'] = (
