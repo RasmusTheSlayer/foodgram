@@ -8,7 +8,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key-for-dev')
 if not SECRET_KEY:
     SECRET_KEY = get_random_secret_key()
 
-DEBUG = os.getenv('DEBUG')
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
 
@@ -113,7 +113,6 @@ DJOSER = {
     'SERIALIZERS': {
         'user': 'api.serializers.CustomUserSerializer',
         'current_user': 'api.serializers.CustomUserSerializer',
-        'user_create': 'api.serializers.CustomUserCreateSerializer',
     },
     'PERMISSIONS': {
         'user': ['rest_framework.permissions.AllowAny'],

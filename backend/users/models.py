@@ -3,12 +3,10 @@ from django.db import models
 
 
 class User(AbstractUser):
-    """Кастомная модель пользователя"""
     email = models.EmailField(
-        max_length=254,
         unique=True,
         verbose_name='Адрес электронной почты',
-        help_text='Обязательное поле. Используется для входа.'
+        help_text='Обязательное поле. Используется для входа.',
     )
     first_name = models.CharField(
         max_length=150,
@@ -33,7 +31,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
-        ordering = ('id',)
+        ordering = ('username',)
 
     def __str__(self):
         return self.username
