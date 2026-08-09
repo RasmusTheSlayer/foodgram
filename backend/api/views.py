@@ -27,7 +27,7 @@ from .serializers import (
     RecipeReadSerializer,
     RecipeWriteSerializer,
     ShoppingCartSerializer,
-    SubscriptionRepresentationSerializer,
+    UserSubscriptionSerializer,
     SubscriptionSerializer,
     TagSerializer,
     UserSerializer,
@@ -227,7 +227,7 @@ class UserViewSet(DjoserUserViewSet):
             subscribers__user=request.user
         ).order_by('id')
         page = self.paginate_queryset(authors)
-        serializer = SubscriptionRepresentationSerializer(
+        serializer = UserSubscriptionSerializer(
             page, many=True, context={'request': request}
         )
         return self.get_paginated_response(serializer.data)
