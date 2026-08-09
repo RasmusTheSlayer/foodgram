@@ -202,12 +202,13 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
-        return SubscriptionRepresentationSerializer(
+        return UserSubscriptionSerializer(
             instance.author, context=self.context
         ).data
 
 
-class SubscriptionRepresentationSerializer(serializers.ModelSerializer):
+class UserSubscriptionSerializer(serializers.ModelSerializer):
+    """Сериализатор пользователя с информацией о подписке и рецептах."""
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
@@ -216,7 +217,7 @@ class SubscriptionRepresentationSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'email', 'id', 'username', 'first_name', 'last_name',
-            'avatar', 'is_subscribed', 'recipes', 'recipes_count'
+            'avatar', 'is_subscribed', 'recipes', 'recipes_count',
         )
 
     def get_is_subscribed(self, obj):
