@@ -155,6 +155,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         short_link = request.build_absolute_uri(f'/s/{recipe.short_code}')
         return Response({'short-link': short_link})
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class UserViewSet(DjoserUserViewSet):
     queryset = User.objects.all()
