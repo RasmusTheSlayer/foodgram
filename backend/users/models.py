@@ -6,7 +6,7 @@ class User(AbstractUser):
     email = models.EmailField(
         unique=True,
         verbose_name='Адрес электронной почты',
-        help_text='Обязательное поле. Используется для входа.',
+        help_text='Обязательное поле.',
     )
     first_name = models.CharField(
         max_length=150,

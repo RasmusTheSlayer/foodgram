@@ -1,6 +1,6 @@
 import django_filters
 
-from recipes.models import Recipe, Tag
+from recipes.models import Ingredient, Recipe, Tag
 
 
 class RecipeFilter(django_filters.FilterSet):
@@ -8,7 +8,7 @@ class RecipeFilter(django_filters.FilterSet):
         field_name='tags__slug',
         to_field_name='slug',
         queryset=Tag.objects.all(),
-        label='Теги'
+        label='Теги',
     )
     author = django_filters.NumberFilter(field_name='author__id')
     is_favorited = django_filters.CharFilter(method='filter_is_favorited')
@@ -41,5 +41,5 @@ class IngredientFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='istartswith')
 
     class Meta:
-        model = Recipe
+        model = Ingredient
         fields = ('name',)

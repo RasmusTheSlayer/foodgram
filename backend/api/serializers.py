@@ -64,7 +64,6 @@ class RecipeIngredientWriteSerializer(serializers.ModelSerializer):
     id = serializers.PrimaryKeyRelatedField(
         queryset=Ingredient.objects.all(), source='ingredient'
     )
-    amount = serializers.IntegerField()
 
     class Meta:
         model = RecipeIngredient
@@ -204,32 +203,21 @@ class SubscriptionSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         return SubscriptionRepresentationSerializer(
-            instance, context=self.context
+            instance.author, context=self.context
         ).data
 
 
 class SubscriptionRepresentationSerializer(serializers.ModelSerializer):
-    email = serializers.ReadOnlyField(source='author.email')
-    id = serializers.ReadOnlyField(source='author.id')
-    username = serializers.ReadOnlyField(source='author.username')
-    first_name = serializers.ReadOnlyField(source='author.first_name')
-    last_name = serializers.ReadOnlyField(source='author.last_name')
-    avatar = serializers.SerializerMethodField()
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = Subscription
+        model = User
         fields = (
             'email', 'id', 'username', 'first_name', 'last_name',
-            'avatar', 'is_subscribed', 'recipes', 'recipes_count',
+            'avatar', 'is_subscribed', 'recipes', 'recipes_count'
         )
-
-    def get_avatar(self, obj):
-        if obj.author.avatar:
-            return obj.author.avatar.url
-        return None
 
     def get_is_subscribed(self, obj):
         return True
@@ -237,7 +225,7 @@ class SubscriptionRepresentationSerializer(serializers.ModelSerializer):
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.query_params.get('recipes_limit')
-        recipes = obj.author.recipes.all()
+        recipes = obj.recipes.all()
         if limit:
             try:
                 limit = int(limit)
@@ -247,7 +235,7 @@ class SubscriptionRepresentationSerializer(serializers.ModelSerializer):
         return ShortRecipeSerializer(recipes, many=True).data
 
     def get_recipes_count(self, obj):
-        return obj.author.recipes.count()
+        return obj.recipes.count()
 
 
 class FavoriteSerializer(serializers.ModelSerializer):

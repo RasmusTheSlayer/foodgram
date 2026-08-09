@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'djoser',
     'django_filters',
+    'drf_extra_fields',
     'users',
     'recipes',
     'api',
@@ -130,7 +131,5 @@ DJOSER = {
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://foodgramproject.ru',
-    'https://www.foodgramproject.ru',
-]
+_csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS', '')
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_origins.split(',') if origin.strip()]

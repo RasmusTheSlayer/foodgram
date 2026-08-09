@@ -7,16 +7,30 @@ from django.db import models
 from users.models import User
 
 
+MAX_LENGTH_TAG_NAME = 32
+MAX_LENGTH_TAG_SLUG = 32
+MAX_LENGTH_INGREDIENT_NAME = 128
+MAX_LENGTH_INGREDIENT_UNIT = 64
+MAX_LENGTH_RECIPE_NAME = 256
+MAX_COOKING_TIME = 32000
+MIN_COOKING_TIME = 1
+MIN_AMOUNT = 1
+MAX_AMOUNT = 32000
+SHORT_CODE_LENGTH = 10
+SHORT_CODE_CHARS = string.ascii_letters + string.digits
+SHORT_CODE_SIZE = 6
+
+
 class Tag(models.Model):
     name = models.CharField(
-        max_length=32,
+        max_length=MAX_LENGTH_TAG_NAME,
         unique=True,
-        verbose_name='Название'
+        verbose_name='Название',
     )
     slug = models.SlugField(
-        max_length=32,
+        max_length=MAX_LENGTH_TAG_SLUG,
         unique=True,
-        verbose_name='Slug'
+        verbose_name='Slug',
     )
 
     class Meta:
@@ -30,12 +44,12 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     name = models.CharField(
-        max_length=128,
-        verbose_name='Название'
+        max_length=MAX_LENGTH_INGREDIENT_NAME,
+        verbose_name='Название',
     )
     measurement_unit = models.CharField(
-        max_length=64,
-        verbose_name='Единица измерения'
+        max_length=MAX_LENGTH_INGREDIENT_UNIT,
+        verbose_name='Единица измерения',
     )
 
     class Meta:
@@ -44,7 +58,8 @@ class Ingredient(models.Model):
         ordering = ('name',)
         constraints = [
             models.UniqueConstraint(
-                fields=['name', 'measurement_unit'], name='unique_ingredient'
+                fields=['name', 'measurement_unit'],
+                name='unique_ingredient',
             )
         ]
 
@@ -57,42 +72,45 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='recipes',
-        verbose_name='Автор'
+        verbose_name='Автор',
     )
     name = models.CharField(
-        max_length=256,
-        verbose_name='Название рецепта'
+        max_length=MAX_LENGTH_RECIPE_NAME,
+        verbose_name='Название рецепта',
     )
     image = models.ImageField(
         upload_to='recipes/images/',
-        verbose_name='Изображение'
+        verbose_name='Изображение',
     )
     text = models.TextField(verbose_name='Описание')
     cooking_time = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(32000)],
+        validators=[
+            MinValueValidator(MIN_COOKING_TIME),
+            MaxValueValidator(MAX_COOKING_TIME),
+        ],
         verbose_name='Время приготовления',
     )
     tags = models.ManyToManyField(
         Tag,
         through='RecipeTag',
         related_name='recipes',
-        verbose_name='Теги'
+        verbose_name='Теги',
     )
     ingredients = models.ManyToManyField(
         Ingredient,
         through='RecipeIngredient',
         related_name='recipes',
-        verbose_name='Ингредиенты'
+        verbose_name='Ингредиенты',
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Дата публикации'
+        verbose_name='Дата публикации',
     )
     short_code = models.CharField(
-        max_length=10,
+        max_length=SHORT_CODE_LENGTH,
         unique=True,
         blank=True,
-        verbose_name='Код короткой ссылки'
+        verbose_name='Код короткой ссылки',
     )
 
     class Meta:
@@ -105,15 +123,17 @@ class Recipe(models.Model):
             self.short_code = self._generate_short_code()
         super().save(*args, **kwargs)
 
-    def _generate_short_code(self):
-        chars = string.ascii_letters + string.digits
-        while True:
-            code = ''.join(random.choices(chars, k=6))
-            if not Recipe.objects.filter(short_code=code).exists():
-                return code
-
     def __str__(self):
         return self.name
+
+    def _generate_short_code(self):
+        occupied_codes = set(
+            Recipe.objects.values_list('short_code', flat=True)
+        )
+        while True:
+            code = ''.join(random.choices(SHORT_CODE_CHARS, k=SHORT_CODE_SIZE))
+            if code not in occupied_codes:
+                return code
 
 
 class RecipeIngredient(models.Model):
@@ -121,16 +141,19 @@ class RecipeIngredient(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         related_name='ingredient_amounts',
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
     )
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        verbose_name='Ингредиент'
+        verbose_name='Ингредиент',
     )
     amount = models.PositiveSmallIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(32000)],
-        verbose_name='Количество'
+        validators=[
+            MinValueValidator(MIN_AMOUNT),
+            MaxValueValidator(MAX_AMOUNT),
+        ],
+        verbose_name='Количество',
     )
 
     class Meta:
@@ -139,25 +162,28 @@ class RecipeIngredient(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
-                name='unique_recipe_ingredient'
+                name='unique_recipe_ingredient',
             )
         ]
 
     def __str__(self):
-        return (f'{self.ingredient.name} — {self.amount}'
-                f'{self.ingredient.measurement_unit}')
+        return (
+            f'{self.ingredient.name} — '
+            f'{self.amount} '
+            f'{self.ingredient.measurement_unit}'
+        )
 
 
 class RecipeTag(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
     )
     tag = models.ForeignKey(
         Tag,
         on_delete=models.CASCADE,
-        verbose_name='Тег'
+        verbose_name='Тег',
     )
 
     class Meta:
@@ -166,7 +192,7 @@ class RecipeTag(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'tag'],
-                name='unique_recipe_tag'
+                name='unique_recipe_tag',
             )
         ]
 
@@ -179,13 +205,13 @@ class Favorite(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='favorites',
-        verbose_name='Пользователь'
+        verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='favorites',
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
     )
 
     class Meta:
@@ -194,7 +220,7 @@ class Favorite(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
-                name='unique_favorite'
+                name='unique_favorite',
             )
         ]
 
@@ -207,13 +233,13 @@ class ShoppingCart(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='shopping_cart',
-        verbose_name='Пользователь'
+        verbose_name='Пользователь',
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='in_shopping_cart',
-        verbose_name='Рецепт'
+        verbose_name='Рецепт',
     )
 
     class Meta:
@@ -222,7 +248,7 @@ class ShoppingCart(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
-                name='unique_shopping_cart'
+                name='unique_shopping_cart',
             )
         ]
 
@@ -235,13 +261,13 @@ class Subscription(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='subscriptions',
-        verbose_name='Подписчик'
+        verbose_name='Подписчик',
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='subscribers',
-        verbose_name='Автор'
+        verbose_name='Автор',
     )
 
     class Meta:
@@ -251,7 +277,7 @@ class Subscription(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'author'],
-                name='unique_subscription'
+                name='unique_subscription',
             )
         ]
 

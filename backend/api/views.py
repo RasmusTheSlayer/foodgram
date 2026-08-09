@@ -18,7 +18,7 @@ from rest_framework.response import Response
 from users.models import User
 
 from .filters import IngredientFilter, RecipeFilter
-from .paginators import CustomPagination
+from .paginators import RecipePagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
     AvatarSerializer,
@@ -56,7 +56,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         IsAuthorOrReadOnly,
     )
-    pagination_class = CustomPagination
+    pagination_class = RecipePagination
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
 
@@ -159,7 +159,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
 class UserViewSet(DjoserUserViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    pagination_class = CustomPagination
+    pagination_class = RecipePagination
 
     @action(
         detail=False,
@@ -223,8 +223,10 @@ class UserViewSet(DjoserUserViewSet):
         permission_classes=[permissions.IsAuthenticated],
     )
     def subscriptions(self, request):
-        subs = Subscription.objects.filter(user=request.user).order_by('id')
-        page = self.paginate_queryset(subs)
+        authors = User.objects.filter(
+            subscribers__user=request.user
+        ).order_by('id')
+        page = self.paginate_queryset(authors)
         serializer = SubscriptionRepresentationSerializer(
             page, many=True, context={'request': request}
         )
