@@ -127,13 +127,13 @@ class Recipe(models.Model):
         return self.name
 
     def _generate_short_code(self):
-        occupied_codes = set(
-            Recipe.objects.values_list('short_code', flat=True)
-        )
-        while True:
-            code = ''.join(random.choices(SHORT_CODE_CHARS, k=SHORT_CODE_SIZE))
-            if code not in occupied_codes:
+        chars = string.ascii_letters + string.digits
+        existing = set(Recipe.objects.values_list('short_code', flat=True))
+        for _ in range(10):
+            code = ''.join(random.choices(chars, k=6))
+            if code not in existing:
                 return code
+        raise RuntimeError("Не удалось сгенерировать уникальный short_code")
 
 
 class RecipeIngredient(models.Model):
