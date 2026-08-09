@@ -94,13 +94,12 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             cd foodgram/infra/
-            sudo docker compose -f docker-compose.prod.yml pull backend frontend
-            sudo docker compose -f docker-compose.prod.yml up -d --no-deps backend frontend
+            sudo docker compose -f docker-compose.prod.yml pull
+            sudo docker compose -f docker-compose.prod.yml up -d
             sudo docker compose -f docker-compose.prod.yml exec backend python manage.py migrate --noinput
-            sudo docker compose -f docker-compose.prod.yml exec backend python manage.py collectstatic --noinput --clear
+            sudo docker compose -f docker-compose.prod.yml exec backend python manage.py collectstatic --noinput
 
             mkdir -p frontend/build
             sudo docker run --rm -v $(pwd)/frontend/build:/mnt ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest sh -c "cp -r /app/build/. /mnt/"
