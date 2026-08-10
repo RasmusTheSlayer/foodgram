@@ -757,7 +757,7 @@ components:
         username:
           type: string
           description: "Уникальный юзернейм"
-          pattern: ^[\w.@+-]+\z
+          pattern: '^[\w.@+-]+\z'
           maxLength: 150
         first_name:
           type: string
@@ -1338,7 +1338,6 @@ components:
 
   securitySchemes:
     Token:
-      description: 'Авторизация по токену. <br>
-      Все запросы от имени пользователя должны выполняться с заголовком "Authorization: Token TOKENVALUE"'
+      description: 'Авторизация по токену. Все запросы от имени пользователя должны выполняться с заголовком "Authorization: Token TOKENVALUE"'
       type: http
       scheme: token

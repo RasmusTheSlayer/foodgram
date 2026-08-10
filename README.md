@@ -18,6 +18,8 @@ Foodgram — веб-приложение для публикации рецеп�
    git clone https://github.com/ваш-аккаунт/foodgram.git
    cd foodgram/infra
    docker compose -f docker-compose.yml up -d
+   Для заполнения БД ингредиентами:
+   docker compose -f docker-compose.yml exec backend python manage.py load_ingredients
 
 Находясь в папке infra, выполните команду docker-compose up. При выполнении этой команды контейнер frontend, описанный в docker-compose.yml, подготовит файлы, необходимые для работы фронтенд-приложения, а затем прекратит свою работу.
 По адресу http://localhost:8080 изучите фронтенд веб-приложения, а по адресу http://localhost/api/docs/ — спецификацию API.

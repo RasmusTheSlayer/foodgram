@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
+MAX_LENGHT = 150
+
+
 class User(AbstractUser):
     email = models.EmailField(
         unique=True,
@@ -9,12 +12,12 @@ class User(AbstractUser):
         help_text='Обязательное поле.',
     )
     first_name = models.CharField(
-        max_length=150,
+        max_length=MAX_LENGHT,
         verbose_name='Имя',
         help_text='Обязательное поле.'
     )
     last_name = models.CharField(
-        max_length=150,
+        max_length=MAX_LENGHT,
         verbose_name='Фамилия',
         help_text='Обязательное поле.'
     )
