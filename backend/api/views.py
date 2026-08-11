@@ -163,9 +163,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe.short_code = generate_short_code()
         recipe.save()
 
-    def redirect_short_link(request, short_code):
+    @action(detail=False, methods=['get'], url_path='r/(?P<short_code>[^/.]+)')
+    def resolve_short_link(self, request, short_code=None):
         recipe = get_object_or_404(Recipe, short_code=short_code)
-        return redirect(f'/recipes/{recipe.id}')
+        return redirect(f'/recipes/{recipe.id}/')
 
 
 class UserViewSet(DjoserUserViewSet):
