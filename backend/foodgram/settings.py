@@ -25,7 +25,6 @@ INSTALLED_APPS = [
     'djoser',
     'django_filters',
     'drf_extra_fields',
-    'drf_spectacular',
     'users',
     'recipes',
     'api',
@@ -108,7 +107,6 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 6,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 DJOSER = {
@@ -135,11 +133,3 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 _csrf_origins = os.getenv('CSRF_TRUSTED_ORIGINS', '')
 CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in _csrf_origins.split(',') if origin.strip()]
-
-
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'Foodgram API',
-    'DESCRIPTION': 'API для сервиса публикации рецептов',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
-}
