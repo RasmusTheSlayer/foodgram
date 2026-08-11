@@ -10,6 +10,7 @@ from api.views import (
     TagViewSet,
     UserViewSet,
 )
+from api.utils import redirect_short_link
 
 router = DefaultRouter()
 router.register('tags', TagViewSet, basename='tags')
@@ -21,6 +22,11 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('api/auth/', include('djoser.urls.authtoken')),
+    path(
+        'r/<str:short_code>/',
+        redirect_short_link,
+        name='short-link-redirect'
+    ),
 ]
 
 if settings.DEBUG:

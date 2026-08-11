@@ -1,6 +1,6 @@
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet as DjoserUserViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 from recipes.models import (
@@ -162,11 +162,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = serializer.save(author=self.request.user)
         recipe.short_code = generate_short_code()
         recipe.save()
-
-    @action(detail=False, methods=['get'], url_path='r/(?P<short_code>[^/.]+)')
-    def resolve_short_link(self, request, short_code=None):
-        recipe = get_object_or_404(Recipe, short_code=short_code)
-        return redirect(f'/recipes/{recipe.id}/')
 
 
 class UserViewSet(DjoserUserViewSet):
