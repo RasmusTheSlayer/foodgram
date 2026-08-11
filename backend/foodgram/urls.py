@@ -34,6 +34,9 @@ urlpatterns = [
     path('api/docs/redoc/',
          SpectacularRedocView.as_view(url_name='schema'),
          name='redoc'),
+    path('api/docs/openapi-schema.yml',
+         SpectacularAPIView.as_view(),
+         name='schema-yml'),
 ]
 
 if settings.DEBUG:
