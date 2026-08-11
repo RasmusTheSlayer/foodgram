@@ -15,6 +15,8 @@ class RecipeFilter(django_filters.FilterSet):
     is_in_shopping_cart = django_filters.CharFilter(
         method='filter_is_in_shopping_cart'
     )
+    short_link = django_filters.CharFilter(field_name='short_code',
+                                           lookup_expr='exact')
 
     class Meta:
         model = Recipe
